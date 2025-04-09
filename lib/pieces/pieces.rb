@@ -1,23 +1,19 @@
-class Pieces
-  attr_accessor :color, :position, :alive, :symbol
+# instance variables @color, @alive, @position and @symbol added to Piece Class
+# set up Knight Class to inherit variables and methods from Piece Superclass
+# Piece Class contains generic methods specific
 
-  def initialize(color, position, symbol)
+class Pieces
+  attr_accessor :color, :position, :alive, :symbol, :name
+
+  def initialize(color, position, symbol, name)
     @color = color
     @alive = true
     @position = position
     @symbol = symbol
+    @name = name
   end
 
-  def move_to(new_position)
-    @position = new_position
-  end
-
-  # generic helper methods for determining valid moves of each individual piece
-  def filter_valid_moves(moves)
-    moves.select { |new_move_x, new_move_y| valid_coordinates?(new_move_x, new_move_y) }
-  end
-
-  def valid_coordinates?(x, y)
-    x.between?(0, 7) && y.between?(0, 7)
+  def valid_move?(x, y)
+    generate_valid_moves.include?([x, y])
   end
 end
