@@ -16,11 +16,12 @@ module PlayerInput
   def process_player_input(input)
     final_array = []
     coordinate_array = input.split('')
-    first_coordinate = COLUMN_MAP.find { |key, value| key == coordinate_array[0] }
-    final_array << first_coordinate[1]
-
-    second_coordinate = coordinate_array[1].to_i - 1
-    final_array << second_coordinate
+    first_coordinate = coordinate_array[1].to_i - 1
+    final_array << first_coordinate
+    # letter corresponds to the second coordinate
+    second_coordinate = COLUMN_MAP.find { |key, value| key == coordinate_array[0] }
+    final_array << second_coordinate[1]
+    p final_array
   end
 
   def request_and_process_start_coordinate
