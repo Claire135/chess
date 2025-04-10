@@ -5,16 +5,13 @@ require_relative 'pieces/king'
 require_relative 'pieces/pawn'
 require_relative 'pieces/castle'
 require_relative 'pieces/queen'
-require_relative 'movable'
-require_relative 'player_input'
 
 class Board
-  include Movable
-  include PlayerInput
+  attr_reader :white_pieces, :black_pieces
+  attr_accessor :board
 
   def initialize
     @board = Array.new(8) { Array.new(8) }
-    @current_piece = nil
     @white_pieces = [
       Castle.new('white', [7, 0], '♖', 'Castle 1'),
       Castle.new('white', [7, 7], '♖', 'Castle 2'),
@@ -51,20 +48,35 @@ class Board
     generate_board
   end
 
-  def delete_captured_piece(captured_piece)
-    if @white_pieces.include?(captured_piece)
-      @white_pieces.delete(captured_piece)
-    else
-      @black_pieces.delete(captured_piece)
-
-    end
+  def [](row, col)
+    @board[row][col]
   end
 
-  def move_piece
-    start_coordinate = request_and_process_start_coordinate
-    @current_piece = find_matching_piece(start_coordinate)
-    end_coordinate = request_and_process_end_coordinate
-    p validate_end_coordinate(end_coordinate, @current_piece)
+  def []=(row, col, value)
+    @board[row][col] = value
+  end
+
+  def captured_piece_at(coordinate)
+    row, col = coordinate
+    @board[row][col]
+  end
+
+  def delete_captured_piece(piece)
+    if piece.color == 'white'
+      @white_pieces.delete(piece)
+    else
+      @black_pieces.delete(piece)
+    end
+    @board[piece.position[0]][piece.position[1]] = nil
+  end
+
+  def empty_at?(row, col)
+    @board[row][col].nil?
+  end
+
+  def enemy_piece_at?(row, col, color)
+    piece = @board[row][col]
+    piece && piece.color != color
   end
 
   private
@@ -79,16 +91,12 @@ class Board
   def generate_board
     puts '  a b c d e f g h'
     @board.each_with_index do |row, i|
-      print "#{8 - i} "
+      print "#{i + 1} "
       row.each do |square|
         print square ? square.symbol + ' ' : '. '
       end
-      puts "#{8 - i}"
+      puts "#{i + 1}"
     end
     puts '  a b c d e f g h'
   end
 end
-
-board = Board.new
-board.display_board
-board.move_piece
