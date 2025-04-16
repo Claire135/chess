@@ -18,7 +18,7 @@ class Pawn < Pieces
     end
 
     # Check if the move is a valid diagonal capture
-    if move_one_step_diagonally?(start_coordinates, end_coordinates) &&
+    if move_one_step_diagonally?(board, start_coordinates, end_coordinates) &&
        board.enemy_at?(end_coordinates, @color) # Ensure that the piece being captured is an enemy
       return true
     end
