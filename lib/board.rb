@@ -103,11 +103,11 @@ class Board
   def generate_board
     puts '  a b c d e f g h'
     @board.each_with_index do |row, i|
-      print "#{i + 1} "
+      print "#{i - 1} "
       row.each do |square|
         print square ? square.symbol + ' ' : '. '
       end
-      puts "#{i + 1}"
+      puts "#{i - 1} "
     end
     puts '  a b c d e f g h'
   end

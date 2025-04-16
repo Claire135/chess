@@ -22,16 +22,24 @@ class Pieces
     @move_count += 1
   end
 
-  # valid moves
+  # useful for queens and castles
   def horizontal_move?(start_coordinates, end_coordinates)
     start_row, start_col = start_coordinates
     end_row, end_col = end_coordinates
     start_row == end_row
   end
 
+  # useful for queens and castles
   def vertical_move?(start_coordinates, end_coordinates)
     start_row, start_col = start_coordinates
     end_row, end_col = end_coordinates
     start_col == end_col
+  end
+
+  # useful for queens and bishops
+  def diagonal_move?(start_coordinates, end_coordinates)
+    row1, col1 = start_coordinates
+    row2, col2 = end_coordinates
+    (row2 - row1).abs == (col2 - col1).abs
   end
 end

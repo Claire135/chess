@@ -1,20 +1,44 @@
 require_relative 'pieces'
+require_relative 'castle'
 
 class King < Pieces
-  def generate_valid_moves(board)
-    row, col = @position
-    directions = [
-      [1, 0], [-1, 0], [0, 1], [0, -1],
-      [1, 1], [1, -1], [-1, 1], [-1, -1]
-    ]
-
-    directions.map { |dr, dc| [row + dr, col + dc] }.select do |r, c|
-      on_board?(r, c) &&
-        (board.empty_at?(r, c) || board.enemy_piece_at?(r, c, @color))
+  def valid_move?(board, start_coordinates, end_coordinates)
+    if (move_one_step_horizontally?(start_coordinates, end_coordinates) ||
+      move_one_step_vertically?(start_coordinates, end_coordinates) ||
+      move_one_step_diagonally?(start_coordinates, end_coordinates) ||
+      castlable?(start_coordinates, end_coordinates)) &&
+       (board.empty_at?(end_coordinates) || board.enemy_at?(end_coordinates, color))
+      true
+    else
+      false
     end
   end
 
-  def on_board?(row, col)
-    row.between?(0, 7) && col.between?(0, 7)
+  def castlable?(start_coordinates, end_coordinates)
+    # king.move_count.zero? &&
+    # castle.move_count.zero? &&
+    # board.enemy_at?(end_coordinates, color) == false &&
+    # board.path_clear?(start_coordinates, end_coordinates)
+  end
+
+  def move_one_step_horizontally?(start_coordinates, end_coordinates)
+    row_diff = (end_coordinates[0] - start_coordinates[0]).abs
+    col_diff = (end_coordinates[1] - start_coordinates[1]).abs
+
+    row_diff.zero? && col_diff == 1
+  end
+
+  def move_one_step_vertically?(start_coordinates, end_coordinates)
+    row_diff = (end_coordinates[0] - start_coordinates[0]).abs
+    col_diff = (end_coordinates[1] - start_coordinates[1]).abs
+
+    col_diff.zero? && row_diff == 1
+  end
+
+  def move_one_step_diagonally?(start_coordinates, end_coordinates)
+    row_diff = (end_coordinates[0] - start_coordinates[0]).abs
+    col_diff = (end_coordinates[1] - start_coordinates[1]).abs
+
+    row_diff == 1 && col_diff == 1
   end
 end

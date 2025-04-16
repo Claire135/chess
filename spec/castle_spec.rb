@@ -1,3 +1,5 @@
+# Tests using actual Board Class
+
 require_relative '../lib/pieces/pieces'
 require_relative '../lib/pieces/castle'
 require_relative '../lib/board'

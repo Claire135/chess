@@ -30,4 +30,18 @@ describe Pieces do
       end
     end
   end
+
+  describe '#diagonal_move?' do
+    context 'if a piece receives diagonal coordinates' do
+      it 'returns true' do
+        expect(piece.diagonal_move?([6, 0], [4, 3]))
+      end
+    end
+
+    context 'if a piece receives non-diagonal coordinates' do
+      it 'returns false' do
+        expect(piece.diagonal_move?([0, 0], [0, 5]))
+      end
+    end
+  end
 end
