@@ -14,23 +14,24 @@ class Pieces
     @move_count = 0
   end
 
-  def valid_move?(row, col, board)
-    generate_valid_moves(board).include?([row, col])
-  end
-
-  def generate_valid_moves(board)
-    row, col = @position
-
-    directions.map { |dr, dc| [row + dr, col + dc] }.select do |r, c|
-      on_board?(r, c) && (board.empty_at?(r, c) || board.enemy_piece_at?(r, c, @color))
-    end
-  end
-
   def on_board?(row, col)
     row.between?(0, 7) && col.between?(0, 7)
   end
 
   def count_moves
     @move_count += 1
+  end
+
+  # valid moves
+  def horizontal_move?(start_coordinates, end_coordinates)
+    start_row, start_col = start_coordinates
+    end_row, end_col = end_coordinates
+    start_row == end_row
+  end
+
+  def vertical_move?(start_coordinates, end_coordinates)
+    start_row, start_col = start_coordinates
+    end_row, end_col = end_coordinates
+    start_col == end_col
   end
 end

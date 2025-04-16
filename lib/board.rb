@@ -44,20 +44,18 @@ class Board
     generate_board
   end
 
-  # facilitates addition of coordinates from MoveContext class
-  #  def [](row, col)
-  #   @board[row][col]
-  # end
+  # used in move_context:: #handle_capture
+  def captured_piece_at(coordinate)
+    row, col = coordinate
+    @board[row][col]
+  end
 
-  # def []=(row, col, value)
-  # @board[row][col] = value
-  # end
+  def empty_at?(end_coordinates)
+    row, col = end_coordinates
+    @board[row][col].nil?
+  end
 
-  #  def captured_piece_at(coordinate)
-  #    row, col = coordinate
-  #    @board[row][col]
-  #  end
-
+  # used in move_context:: #handle_capture
   def delete_captured_piece(piece)
     if piece.color == 'white'
       @white_pieces.delete(piece)
@@ -67,11 +65,8 @@ class Board
     @board[piece.position[0]][piece.position[1]] = nil
   end
 
-  def empty_at?(row, col)
-    @board[row][col].nil?
-  end
-
-  def enemy_piece_at?(row, col, color)
+  def enemy_at?(end_coordinates, color)
+    row, col = end_coordinates
     piece = @board[row][col]
     piece && piece.color != color
   end
