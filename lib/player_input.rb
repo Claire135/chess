@@ -16,6 +16,11 @@ module PlayerInput
     'e' => 4, 'f' => 5, 'g' => 6, 'h' => 7
   }
 
+  ROW_MAP = {
+    '1' => 7, '2' => 6, '3' => 5, '4' => 4, '5' => 3,
+    '6' => 2, '7' => 1, '8' => 0
+  }
+
   def start_coordinate_input_prompt
     puts 'Please enter your starting co-ordinate (e.g. e7):'
     gets.chomp.downcase
@@ -29,10 +34,12 @@ module PlayerInput
   def process_player_input(input)
     final_array = []
     coordinate_array = input.split('')
-    first_coordinate = coordinate_array[1].to_i - 1
+    first_coordinate = ROW_MAP[coordinate_array[1]]
     final_array << first_coordinate
-    # letter corresponds to the second coordinate
-    second_coordinate = COLUMN_MAP.find { |key, value| key == coordinate_array[0] }
-    final_array << second_coordinate[1]
+
+    # Find the column number from COLUMN_MAP based on the first coordinate (the letter)
+    second_coordinate = COLUMN_MAP[coordinate_array[0]]
+    final_array << second_coordinate
+    final_array
   end
 end

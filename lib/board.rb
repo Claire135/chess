@@ -44,7 +44,17 @@ class Board
     generate_board
   end
 
-  # used in move_context:: #handle_capture
+  # Custom getter for accessing a square on the board
+  def [](row, col)
+    @board[row][col]
+  end
+
+  # Custom setter for placing a piece on the board
+  def []=(row, col, piece)
+    @board[row][col] = piece
+  end
+
+  # used in move_context: #handle_capture
   def captured_piece_at(coordinate)
     row, col = coordinate
     @board[row][col]
@@ -55,7 +65,7 @@ class Board
     @board[row][col].nil?
   end
 
-  # used in move_context:: #handle_capture
+  # used in move_context: #handle_capture
   def delete_captured_piece(piece)
     if piece.color == 'white'
       @white_pieces.delete(piece)
@@ -103,11 +113,11 @@ class Board
   def generate_board
     puts '  a b c d e f g h'
     @board.each_with_index do |row, i|
-      print "#{i - 1} "
+      print "#{8 - i} "
       row.each do |square|
         print square ? square.symbol + ' ' : '. '
       end
-      puts "#{i - 1} "
+      puts "#{8 - i} "
     end
     puts '  a b c d e f g h'
   end

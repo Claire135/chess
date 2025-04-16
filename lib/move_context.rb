@@ -1,33 +1,45 @@
 require_relative 'board'
+require_relative 'pieces/pieces'
 require_relative 'player_input'
 
 class MoveContext
   include PlayerInput
-  attr_reader :start_coordinate, :end_coordinate, :board, :current_piece
+  attr_accessor :start_coordinate, :end_coordinate, :board, :current_piece, :last_move
 
   def initialize(board)
     @start_coordinate = nil
     @end_coordinate = nil
     @board = board
     @current_piece = nil
+    @last_move = nil
   end
 
-  def move_piece
+  def place_piece
     @start_coordinate = request_and_process_start_coordinate
     @current_piece = find_matching_piece
     @end_coordinate = request_and_process_end_coordinate
-    place_piece
+    if @current_piece.valid_move?(@board, @start_coordinate, @end_coordinate)
+      handle_capture
+      move_piece_to_end_coordinate
+      update_piece_position
+      update_last_move
+    else
+      puts 'Invalid move, pick another!'
+    end
+  end
+
+  def set_coordinates
+  end
+
+  def update_last_move
+    @last_move = {
+      piece: @current_piece,
+      start: @start_coordinates,
+      end: @end_coordinates
+    }
   end
 
   private
-
-  def place_piece
-    return puts 'Not a valid move!' unless validate_end_coordinate
-
-    handle_capture
-    move_piece_to_end_coordinate
-    update_piece_position
-  end
 
   def handle_capture
     captured_piece = @board.captured_piece_at(@end_coordinate) # Capture the piece at the destination
@@ -61,12 +73,4 @@ class MoveContext
   def all_pieces
     @board.white_pieces + @board.black_pieces
   end
-end
-
-board = Board.new
-game = MoveContext.new(board)
-board.display_board
-loop do
-  game.move_piece
-  board.display_board
 end
