@@ -3,11 +3,8 @@
 require_relative 'move_context'
 require_relative 'player'
 require_relative 'board'
-require_relative 'game_logic'
 
 class PlayGame
-  include GameLogic
-
   def initialize
     @chess_board = Board.new
     @white_player = Player.new('White Player', 'white')
@@ -21,6 +18,7 @@ class PlayGame
     loop do
       puts "#{@current_player.name}'s turn:"
       move_piece
+      @chess_board.check?
       @chess_board.display_board
       switch_players
     end
@@ -34,7 +32,10 @@ class PlayGame
     @move.set_end_coordinate
     if @move.current_piece.valid_move?(@chess_board, @move.start_coordinate, @move.end_coordinate) &&
        @current_player.player_piece_match?(@move.current_piece)
-      capture_piece
+
+      was_capture = @chess_board.captured_piece_at(@move.end_coordinate)
+      capture_piece if was_capture
+
       @move.handle_movement
     else
       puts 'Invalid move, pick another!' # THIS NEEDS AN ERROR LOOP!!!!

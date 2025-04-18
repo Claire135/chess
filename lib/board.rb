@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative 'pieces/pieces'
 require_relative 'pieces/knight'
 require_relative 'pieces/bishop'
@@ -5,6 +7,7 @@ require_relative 'pieces/king'
 require_relative 'pieces/pawn'
 require_relative 'pieces/castle'
 require_relative 'pieces/queen'
+require_relative 'win_conditions'
 
 # captured_piece_at - identifies captured piece
 # delete_captured_piece - deletes captured piece
@@ -13,6 +16,7 @@ require_relative 'pieces/queen'
 # enemy_piece_at? = checks if a pieces is of a different color
 
 class Board
+  include WinConditions
   attr_reader :white_pieces, :black_pieces
   attr_accessor :board
 
@@ -38,10 +42,6 @@ class Board
       board[row][col] = piece
     end
     board
-  end
-
-  def display_board
-    generate_board
   end
 
   # Custom getter for accessing a square on the board
@@ -87,8 +87,6 @@ class Board
     end
   end
 
-  private
-
   def between(start_coordinates, end_coordinates)
     row1, col1 = start_coordinates
     row2, col2 = end_coordinates
@@ -110,12 +108,12 @@ class Board
     coordinates
   end
 
-  def generate_board
+  def display_board
     puts '  a b c d e f g h'
     @board.each_with_index do |row, i|
       print "#{8 - i} "
       row.each do |square|
-        print square ? square.symbol + ' ' : '. '
+        print square ? "#{square.symbol} " : '. '
       end
       puts "#{8 - i} "
     end
@@ -123,24 +121,24 @@ class Board
   end
 
   WHITE_PIECE_ARRAY = [
+    King.new('white', [7, 4], '♔', 'King'),
     Castle.new('white', [7, 0], '♖', 'Castle 1'),
     Castle.new('white', [7, 7], '♖', 'Castle 2'),
     Knight.new('white', [7, 1], '♘', 'Knight 1'),
     Knight.new('white', [7, 6], '♘', 'Knight 2'),
     Bishop.new('white', [7, 2], '♗', 'Bishop 1'),
     Bishop.new('white', [7, 5], '♗', 'Bishop 2'),
-    Queen.new('white', [7, 3], '♕', 'Queen'),
-    King.new('white', [7, 4], '♔', 'King')
-  ]
+    Queen.new('white', [7, 3], '♕', 'Queen')
+  ].freeze
 
   BLACK_PIECE_ARRAY = [
+    King.new('black', [0, 4], '♚', 'King'),
     Castle.new('black', [0, 0], '♜', 'Castle 1'),
     Knight.new('black', [0, 1], '♞', 'Knight 1'),
     Bishop.new('black', [0, 2], '♝', 'Bishop 1'),
     Queen.new('black', [0, 3], '♛', 'Queen'),
-    King.new('black', [0, 4], '♚', 'King'),
     Knight.new('black', [0, 6], '♞', 'Knight 2'),
     Bishop.new('black', [0, 5], '♝', 'Bishop 2'),
     Castle.new('black', [0, 7], '♜', 'Castle 2')
-  ]
+  ].freeze
 end

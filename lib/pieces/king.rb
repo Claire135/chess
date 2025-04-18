@@ -1,7 +1,16 @@
+# frozen_string_literal: true
+
 require_relative 'pieces'
 require_relative 'castle'
 
 class King < Pieces
+  attr_accessor :in_check
+
+  def initialize(...)
+    super
+    @in_check = false
+  end
+
   def valid_move?(board, start_coordinates, end_coordinates)
     if (move_one_step_horizontally?(start_coordinates, end_coordinates) ||
       move_one_step_vertically?(start_coordinates, end_coordinates) ||
