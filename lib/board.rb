@@ -7,7 +7,7 @@ require_relative 'pieces/king'
 require_relative 'pieces/pawn'
 require_relative 'pieces/castle'
 require_relative 'pieces/queen'
-require_relative 'win_conditions'
+require_relative 'serializable/base_serializable'
 
 # captured_piece_at - identifies captured piece
 # delete_captured_piece - deletes captured piece
@@ -16,9 +16,8 @@ require_relative 'win_conditions'
 # enemy_piece_at? = checks if a pieces is of a different color
 
 class Board
-  include WinConditions
-  attr_reader :white_pieces, :black_pieces
-  attr_accessor :board
+  include BaseSerializable
+  attr_accessor :board, :white_pieces, :black_pieces
 
   def initialize
     @white_pieces = Board::WHITE_PIECE_ARRAY.dup
@@ -44,6 +43,28 @@ class Board
     board
   end
 
+  def to_h
+    {
+      white_pieces: @white_pieces.map(&:to_h),
+      black_pieces: @black_pieces.map(&:to_h)
+    }
+  end
+
+  def self.from_h(hash)
+    Board.new.tap do |board|
+      # Ensure you use the correct string keys instead of instance variable names
+      board.white_pieces = hash['white_pieces']&.map { |w| Pieces.from_h(w) } || []
+      board.black_pieces = hash['black_pieces']&.map { |b| Pieces.from_h(b) } || []
+
+      # Initialize the board array (8x8 grid)
+      board.board = Array.new(8) { Array.new(8) }
+      (board.white_pieces + board.black_pieces).each do |piece|
+        row, col = piece.position
+        board.board[row][col] = piece
+      end
+    end
+  end
+
   # Custom getter for accessing a square on the board
   def [](row, col)
     @board[row][col]
@@ -60,8 +81,10 @@ class Board
     @board[row][col]
   end
 
-  def empty_at?(end_coordinates)
-    row, col = end_coordinates
+  def empty_at?(coordinates)
+    row, col = coordinates
+    return false unless row.between?(0, 7) && col.between?(0, 7)
+
     @board[row][col].nil?
   end
 
@@ -75,10 +98,12 @@ class Board
     @board[piece.position[0]][piece.position[1]] = nil
   end
 
-  def enemy_at?(end_coordinates, color)
-    row, col = end_coordinates
+  def enemy_at?(coordinates, color)
+    row, col = coordinates
+    return false unless row.between?(0, 7) && col.between?(0, 7)
+
     piece = @board[row][col]
-    piece && piece.color != color
+    !piece.nil? && piece.color != color
   end
 
   def path_clear?(start_coordinates, end_coordinates)

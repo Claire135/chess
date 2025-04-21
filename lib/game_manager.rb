@@ -1,6 +1,4 @@
 require_relative 'serializable/base_serializable'
-
-# Saves and loads games based on prompts from game menu
 require 'json'
 
 class GameManager
@@ -14,13 +12,10 @@ class GameManager
     puts 'Game Saved!'
   end
 
-  def self.load
-    return unless File.exist?(SAVE_FILE)
-
-    saved_data = File.read(SAVE_FILE)
-    game = PlayGame.new
-    game.unserialize(saved_data)
-    puts 'Game loaded!'
-    game
+  def self.load(filename = SAVE_FILE)
+    serialized_data = File.read(filename)
+    puts "DEBUG - Serialized Data: #{serialized_data}" # Add this line
+    hash = JSON.parse(serialized_data) # or Marshal.load, depending on your serializer
+    PlayGame.from_h(hash)
   end
 end

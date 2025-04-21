@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # subclass of Pieces
 
 require_relative 'pieces'

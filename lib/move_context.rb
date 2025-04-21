@@ -14,7 +14,6 @@ class MoveContext
     @board = board
     @current_piece = nil
     @captured_piece = nil
-    @last_move = nil
   end
 
   def handle_movement

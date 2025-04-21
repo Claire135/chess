@@ -24,9 +24,9 @@ class King < Pieces
   end
 
   def possible_moves(start_coordinates, end_coordinates)
-    move_one_step_horizontally?(start_coordinates, end_coordinates)
-    move_one_step_vertically?(start_coordinates, end_coordinates)
-    move_one_step_diagonally?(start_coordinates, end_coordinates)
+    move_one_step_horizontally?(start_coordinates, end_coordinates) ||
+      move_one_step_vertically?(start_coordinates, end_coordinates) ||
+      move_one_step_diagonally?(start_coordinates, end_coordinates)
   end
 
   def move_one_step_horizontally?(start_coordinates, end_coordinates)

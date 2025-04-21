@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative 'pieces'
 
 # no en_passant
@@ -40,7 +42,7 @@ class Pawn < Pieces
     start_row, start_col = start_coordinates
     end_row, end_col = end_coordinates
 
-    return false unless @move_count == 0 && end_col == start_col
+    return false unless @move_count.zero? && end_col == start_col
 
     @color == 'black' ? end_row - start_row == 2 : start_row - end_row == 2
   end
