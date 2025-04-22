@@ -5,12 +5,10 @@ require_relative 'player'
 require_relative 'board'
 require_relative 'win_conditions'
 require_relative 'ui_able'
-require_relative 'game_menu'
 require_relative 'player_input'
 
 class PlayGame
   include UIable
-  include GameMenu
   include PlayerInput
 
   def initialize
@@ -81,25 +79,18 @@ class PlayGame
   end
 
   def move_piece
-    @move.start_coordinate = request_and_process_start_coordinate
-    p "start #{@move.start_coordinate}"
+    @move.start_coordinate = request_and_process_start_coordinate(@current_player, @chess_board, @move)
     @move.set_current_piece
-    p "current #{@move.current_piece}"
-    @move.end_coordinate = request_and_process_end_coordinate(@move.current_piece)
-    p "end #{@move.end_coordinate}"
-    if @move.current_piece.valid_move?(@chess_board, @move.start_coordinate, @move.end_coordinate) &&
-       @current_player.player_piece_match?(@move.current_piece)
+    @move.end_coordinate = request_and_process_end_coordinate(@current_player, @chess_board, @move)
 
-      was_capture = @chess_board.captured_piece_at(@move.end_coordinate)
-      if was_capture
-        capture_piece
-        score_message
-      end
-
-      @move.handle_movement
-    else
-      puts 'Invalid move, pick another!' # THIS NEEDS AN ERROR LOOP!!!!
+    was_capture = @chess_board.captured_piece_at(@move.end_coordinate)
+    if was_capture
+      capture_piece
+      score_message
+      capture_message(@move)
     end
+
+    @move.handle_movement
   end
 
   def capture_piece

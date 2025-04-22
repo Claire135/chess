@@ -1,16 +1,59 @@
 # frozen_string_literal: true
 
 module PlayerInput
-  def request_and_process_start_coordinate
-    input = start_coordinate_input_prompt
-    open_menu if input == 'm'
-    process_player_input(input)
+  def request_and_process_start_coordinate(current_player, chess_board, move)
+    loop do
+      puts "#{current_player.name}, please enter your starting co-ordinate (e.g. e7): "
+      input = gets.chomp.downcase
+
+      if input == 'm'
+        open_menu
+        next
+      end
+
+      unless input.match?(/^[a-h][1-8]$/)
+        puts 'Invalid input format. Try something like e2 or d7.'
+        next
+      end
+
+      coordinate = process_player_input(input)
+
+      if chess_board.enemy_at?(coordinate, current_player.color)
+        puts 'That is an enemy piece. Please choose your own piece.'
+        next
+      end
+
+      return coordinate if move.find_matching_piece(coordinate)
+
+      puts 'No piece found at that location.'
+    end
   end
 
-  def request_and_process_end_coordinate(piece)
-    input = end_coordinate_input_prompt(piece)
-    open_menu if input == 'm'
-    process_player_input(input)
+  def request_and_process_end_coordinate(current_player, chess_board, move)
+    loop do
+      puts "#{current_player.name}, please enter the coordinates to move your #{move.current_piece.name} (e.g. e4):"
+      input = gets.chomp.downcase
+
+      if input == 'm'
+        open_menu
+        next
+      end
+
+      unless input.match?(/^[a-h][1-8]$/)
+        puts 'Invalid input format. Try something like e2 or d7.'
+        next
+      end
+
+      coordinate = process_player_input(input)
+
+      # Validate the move
+      if move.current_piece.valid_move?(chess_board, move.start_coordinate, coordinate) &&
+         current_player.player_piece_match?(move.current_piece)
+        return coordinate
+      else
+        puts 'Not a valid move!'
+      end
+    end
   end
 
   def open_menu
@@ -75,16 +118,6 @@ module PlayerInput
     '1' => 7, '2' => 6, '3' => 5, '4' => 4, '5' => 3,
     '6' => 2, '7' => 1, '8' => 0
   }.freeze
-
-  def start_coordinate_input_prompt
-    puts 'Please enter your starting co-ordinate (e.g. e7):'
-    gets.chomp.downcase
-  end
-
-  def end_coordinate_input_prompt(piece)
-    puts "Please enter the co-ordinates for where you want to move #{piece.name} (e.g. e4): "
-    gets.chomp.downcase
-  end
 
   def process_player_input(input)
     final_array = []
