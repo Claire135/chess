@@ -3,12 +3,65 @@
 module PlayerInput
   def request_and_process_start_coordinate
     input = start_coordinate_input_prompt
+    open_menu if input == 'm'
     process_player_input(input)
   end
 
-  def request_and_process_end_coordinate
-    input = end_coordinate_input_prompt
+  def request_and_process_end_coordinate(piece)
+    input = end_coordinate_input_prompt(piece)
+    open_menu if input == 'm'
     process_player_input(input)
+  end
+
+  def open_menu
+    puts "\n=== Game Menu ==="
+    puts 's - Save and Exit'
+    puts 'q - Quit game'
+    puts 'c - Continue playing'
+
+    case gets.chomp.downcase
+    when 's'
+      save_game
+      puts 'Exiting after save.'
+      exit
+    when 'q'
+      puts 'Thanks for playing!'
+      exit
+    when 'c'
+      nil
+    else
+      puts 'Invalid choice. Returning to game.'
+    end
+  end
+
+  def play_again_prompt
+    puts 'Do you want to play again? (y/n)'
+    input = gets.chomp.downcase
+    if input == 'y'
+      GameLauncher.start
+    else
+      puts 'Thanks for playing!'
+      exit
+    end
+  end
+
+  def game_start_or_load_prompt
+    puts 'Welcome to Chess!'
+    puts 'Would you like to start a new game or load a saved one? (n for new, l for load)'
+    choice = gets.chomp.downcase
+
+    if choice == 'l'
+      load_game
+      puts 'Game loaded.'
+      puts
+    elsif choice == 'n'
+      puts
+      puts 'Starting a new game... '
+      puts
+      play_game
+    else
+      puts 'Invalid choice. Starting a new game.'
+    end
   end
 
   private
@@ -28,8 +81,8 @@ module PlayerInput
     gets.chomp.downcase
   end
 
-  def end_coordinate_input_prompt
-    puts "Please enter the co-ordinates for where you want to move #{@current_piece.name} (e.g. e4): "
+  def end_coordinate_input_prompt(piece)
+    puts "Please enter the co-ordinates for where you want to move #{piece.name} (e.g. e4): "
     gets.chomp.downcase
   end
 

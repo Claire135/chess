@@ -7,7 +7,6 @@ require_relative 'pieces/king'
 require_relative 'pieces/pawn'
 require_relative 'pieces/castle'
 require_relative 'pieces/queen'
-require_relative 'serializable/base_serializable'
 
 # captured_piece_at - identifies captured piece
 # delete_captured_piece - deletes captured piece
@@ -16,7 +15,6 @@ require_relative 'serializable/base_serializable'
 # enemy_piece_at? = checks if a pieces is of a different color
 
 class Board
-  include BaseSerializable
   attr_accessor :board, :white_pieces, :black_pieces
 
   def initialize
@@ -41,28 +39,6 @@ class Board
       board[row][col] = piece
     end
     board
-  end
-
-  def to_h
-    {
-      white_pieces: @white_pieces.map(&:to_h),
-      black_pieces: @black_pieces.map(&:to_h)
-    }
-  end
-
-  def self.from_h(hash)
-    Board.new.tap do |board|
-      # Ensure you use the correct string keys instead of instance variable names
-      board.white_pieces = hash['white_pieces']&.map { |w| Pieces.from_h(w) } || []
-      board.black_pieces = hash['black_pieces']&.map { |b| Pieces.from_h(b) } || []
-
-      # Initialize the board array (8x8 grid)
-      board.board = Array.new(8) { Array.new(8) }
-      (board.white_pieces + board.black_pieces).each do |piece|
-        row, col = piece.position
-        board.board[row][col] = piece
-      end
-    end
   end
 
   # Custom getter for accessing a square on the board

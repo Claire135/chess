@@ -2,10 +2,8 @@
 
 require_relative 'board'
 require_relative 'pieces/pieces'
-require_relative 'player_input'
 
 class MoveContext
-  include PlayerInput
   attr_accessor :start_coordinate, :end_coordinate, :board, :current_piece, :last_move, :captured_piece
 
   def initialize(board)

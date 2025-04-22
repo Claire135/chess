@@ -6,7 +6,9 @@ require_relative 'play_game'
 
 class GameLauncher
   def self.start
+    puts '[GameLauncher] Starting...'
     new_game = PlayGame.new
-    new_game.play
+    puts '[GameLauncher] Game initialized'
+    new_game.start_game
   end
 end

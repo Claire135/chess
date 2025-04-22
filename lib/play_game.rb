@@ -6,15 +6,12 @@ require_relative 'board'
 require_relative 'win_conditions'
 require_relative 'ui_able'
 require_relative 'game_menu'
-require_relative 'game_manager'
-require_relative 'serializable/base_serializable'
-require_relative 'serializable/play_game_serializable'
+require_relative 'player_input'
 
 class PlayGame
-  extend PlayGameSerializable
   include UIable
   include GameMenu
-  include BaseSerializable
+  include PlayerInput
 
   def initialize
     @chess_board = Board.new
@@ -25,9 +22,12 @@ class PlayGame
     @win = WinConditions.new(@chess_board)
   end
 
-  def play_game
+  def start_game
+    puts '[PlayGame] Running start_game'
     game_start_or_load_prompt
+  end
 
+  def play_game
     @chess_board.display_board
     loop do
       @win.check?          # <- always update check state
@@ -39,63 +39,41 @@ class PlayGame
       check_message
       @chess_board.display_board
       switch_players
-      save_or_load_prompt
     end
     end_game
     play_again_prompt
   end
 
   def save_game
-    File.write('save_game.json', JSON.dump(to_h))
+    # Open a file to save the game using Marshal
+    File.open('saved_game.marshal', 'wb') do |file|
+      Marshal.dump(self, file) # Serialize the object to the file
+    end
     puts 'Game saved!'
   end
 
   def load_game
-    hash = JSON.parse(File.read('save_game.json'))
-    loaded_game = PlayGameSerializable.from_h(hash)
-    copy_game_state_from(loaded_game)
-    puts 'Game loaded!'
-  end
-
-  def copy_game_state_from(other)
-    @chess_board = other.chess_board
-    @white_player = other.white_player
-    @black_player = other.black_player
-    @current_player = other.current_player
-    @win = other.win
-    @move = MoveContext.new(@chess_board) # Re-establish context
-  end
-
-  def to_h
-    {
-      'chess_board' => @chess_board.to_h,
-      'white_player' => @white_player.to_h,
-      'black_player' => @black_player.to_h,
-      'current_player' => @current_player.to_h,
-      'win' => @win.to_h
-    }
-  end
-
-  def self.from_h(hash)
-    PlayGame.new.tap do |game|
-      game.instance_variable_set(:@chess_board, Board.from_h(hash['chess_board']))
-      game.instance_variable_set(:@white_player, Player.from_h(hash['white_player']))
-      game.instance_variable_set(:@black_player, Player.from_h(hash['black_player']))
-
-      # Check if @current_player exists before accessing its data
-      if hash['@current_player']
-        game.instance_variable_set(:@current_player, Player.from_h(hash['@current_player']))
-      else
-        # Set a default player or raise an error if this is critical
-        game.instance_variable_set(:@current_player, Player.new(name: 'White Player', color: 'white'))
-      end
-
-      game.instance_variable_set(:@win, WinConditions.from_h(hash['win'], game.chess_board))
-      game.instance_variable_set(:@move, MoveContext.new(game.chess_board))
+    loaded_game = PlayGame.load
+    if loaded_game
+      puts 'Game loaded!'
+      loaded_game.play_game
+      exit
+    else
+      puts 'No saved game found!'
     end
   end
 
   private
+
+  def self.load
+    if File.exist?('saved_game.marshal')
+      File.open('saved_game.marshal', 'rb') do |file|
+        Marshal.load(file)
+      end
+    else
+      nil
+    end
+  end
 
   def end_game
     checkmate_message if @win.checkmate?
@@ -103,9 +81,12 @@ class PlayGame
   end
 
   def move_piece
-    @move.set_start_coordinate
+    @move.start_coordinate = request_and_process_start_coordinate
+    p "start #{@move.start_coordinate}"
     @move.set_current_piece
-    @move.set_end_coordinate
+    p "current #{@move.current_piece}"
+    @move.end_coordinate = request_and_process_end_coordinate(@move.current_piece)
+    p "end #{@move.end_coordinate}"
     if @move.current_piece.valid_move?(@chess_board, @move.start_coordinate, @move.end_coordinate) &&
        @current_player.player_piece_match?(@move.current_piece)
 
@@ -141,6 +122,3 @@ class PlayGame
     end
   end
 end
-
-game = PlayGame.new
-game.play_game
