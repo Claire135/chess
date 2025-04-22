@@ -1,3 +1,5 @@
+require_relative 'move_context'
+
 class WinConditions
   attr_reader :in_check_piece, :checking_piece
 
@@ -47,28 +49,41 @@ class WinConditions
   def king_escape?
     return false unless @in_check_piece
 
-    start_row, start_col = @in_check_piece.position
-    potential_path = [
+    king = @in_check_piece
+    start_row, start_col = king.position
+
+    # Define potential escape squares for the king
+    potential_escapes = [
       [start_row + 1, start_col], [start_row - 1, start_col],
       [start_row, start_col + 1], [start_row, start_col - 1],
       [start_row + 1, start_col + 1], [start_row + 1, start_col - 1],
       [start_row - 1, start_col + 1], [start_row - 1, start_col - 1]
     ]
-    potential_path.any? { |square| @in_check_piece.valid_move?(@board, @in_check_piece.position, square) }
-  end
 
-  def block_path?
-    return false unless @checking_piece && @in_check_piece
+    end_coordinates = potential_escapes.select { |coord| @board.empty_at?(coord) }
 
-    path = @board.between(@checking_piece.position, @in_check_piece.position)
-    return false if path.nil? || !@board.path_clear?(@checking_piece.position, @in_check_piece.position)
-
-    @defenders.any? do |piece|
-      path.any? { |square| piece.valid_move?(@board, piece.position, square) }
+    end_coordinates.any? do |escape|
+      @attackers.none? do |piece|
+        piece.valid_move?(@board, piece.position, escape)
+      end
     end
   end
 
-  # private
+  def block_path?
+    return false if @checking_piece.nil? || @in_check_piece.nil?
+    return false if @checking_piece.is_a?(Knight)
+
+    potential_block = @board.between(@checking_piece.position, @in_check_piece.position)
+    end_coordinates = potential_block.select { |coord| @board.empty_at?(coord) }
+
+    end_coordinates.any? do |block|
+      @defenders.any? do |piece|
+        piece.valid_move?(@board, piece.position, block)
+      end
+    end
+  end
+
+  private
 
   def define_roles
     return unless @checking_piece
