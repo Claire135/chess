@@ -83,8 +83,8 @@ class Board
   end
 
   def path_clear?(start_coordinates, end_coordinates)
-    between(start_coordinates, end_coordinates).all? do |row, col|
-      @board[row][col].nil?
+    between(start_coordinates, end_coordinates).all? do |coord|
+      empty_at?(coord)
     end
   end
 
@@ -124,12 +124,12 @@ class Board
   WHITE_PIECE_ARRAY = [
     King.new('white', [7, 4], '♔', 'King'),
     Castle.new('white', [7, 0], '♖', 'Castle 1'),
-    Castle.new('white', [7, 7], '♖', 'Castle 2'),
     Knight.new('white', [7, 1], '♘', 'Knight 1'),
-    Knight.new('white', [7, 6], '♘', 'Knight 2'),
     Bishop.new('white', [7, 2], '♗', 'Bishop 1'),
+    Queen.new('white', [7, 3], '♕', 'Queen'),
     Bishop.new('white', [7, 5], '♗', 'Bishop 2'),
-    Queen.new('white', [7, 3], '♕', 'Queen')
+    Knight.new('white', [7, 6], '♘', 'Knight 2'),
+    Castle.new('white', [7, 7], '♖', 'Castle 2')
   ].freeze
 
   BLACK_PIECE_ARRAY = [

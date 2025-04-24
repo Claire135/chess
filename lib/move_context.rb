@@ -12,24 +12,17 @@ class MoveContext
     @board = board
     @current_piece = nil
     @captured_piece = nil
+    @last_move = nil
   end
 
   def handle_movement
-    move_piece_to_end_coordinate
+    move_piece_to_end_coordinate(@start_coordinate, @end_coordinate)
     update_piece_position
     update_last_move
   end
 
-  def set_start_coordinate
-    @start_coordinate = request_and_process_start_coordinate
-  end
-
   def set_current_piece
-    @current_piece = find_matching_piece
-  end
-
-  def set_end_coordinate
-    @end_coordinate = request_and_process_end_coordinate
+    @current_piece = find_matching_piece(@start_coordinate)
   end
 
   def handle_capture
@@ -39,7 +32,18 @@ class MoveContext
     @board.delete_captured_piece(captured_piece)
   end
 
+  def find_matching_piece(coordinate)
+    all_pieces.find { |piece| piece.position == coordinate }
+  end
+
   private
+
+  def move_piece_to_end_coordinate(start_coordinate, end_coordinate)
+    end_row, end_col = end_coordinate
+    start_row, start_col = start_coordinate
+    @board[end_row, end_col] = @current_piece
+    @board[start_row, start_col] = nil
+  end
 
   def update_last_move
     @last_move = {
@@ -49,25 +53,9 @@ class MoveContext
     }
   end
 
-  def move_piece_to_end_coordinate
-    end_row, end_col = @end_coordinate
-    start_row, start_col = @start_coordinate
-    @board[end_row, end_col] = @current_piece
-    @board[start_row, start_col] = nil
-  end
-
   def update_piece_position
     @current_piece.position = @end_coordinate
     @current_piece.count_moves
-  end
-
-  def validate_end_coordinate
-    row, col = @end_coordinate
-    @current_piece.valid_move?(row, col, @board)
-  end
-
-  def find_matching_piece
-    all_pieces.find { |piece| piece.position == @start_coordinate }
   end
 
   def all_pieces

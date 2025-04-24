@@ -23,6 +23,8 @@ class Player
     @score -= piece_value(captured_piece)
   end
 
+  private
+
   def piece_value(captured_piece)
     case captured_piece
     when Pawn

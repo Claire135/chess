@@ -59,6 +59,8 @@ class WinConditions
     end
   end
 
+  private
+
   def king_escape?
     return false unless @in_check_piece
 
@@ -94,8 +96,6 @@ class WinConditions
       end
     end
   end
-
-  private
 
   def empty_squares
     empty = []

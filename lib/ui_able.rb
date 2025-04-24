@@ -1,8 +1,6 @@
-module UIable
-  def turn_message
-    puts "#{@current_player.name}'s turn:"
-  end
+# frozen_string_literal: true
 
+module UIable
   def check_message
     return unless @win.in_check_piece
 
@@ -23,7 +21,11 @@ module UIable
     end
   end
 
+  def stalemate_message
+    puts "It's a stalemate!"
+  end
+
   def capture_message(move)
-    puts "#{@move.captured_piece.name} has been captured!"
+    puts "#{move.captured_piece.name} has been captured!"
   end
 end

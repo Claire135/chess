@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Tests using actual Board Class
 
 require_relative '../lib/pieces/pieces'

@@ -29,6 +29,8 @@ class Pawn < Pieces
     false
   end
 
+  private
+
   def move_one_step_forward?(start_coordinates, end_coordinates)
     start_row, start_col = start_coordinates
     end_row, end_col = end_coordinates

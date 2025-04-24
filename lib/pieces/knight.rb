@@ -12,7 +12,9 @@ class Knight < Pieces
     end
   end
 
-  def l_shape_move?(start_coordinates, end_coordinates)
+  private
+
+  def l_shape_move?(start_coordinates, end_coordinates) # rubocop:disable Metrics/MethodLength
     start_row, start_col = start_coordinates
     end_row, end_col = end_coordinates
 
