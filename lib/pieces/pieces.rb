@@ -23,6 +23,27 @@ class Pieces
     @move_count += 1
   end
 
+  def put_king_into_check?(end_coordinates, board, move)
+    # Set attackers (opponent's pieces)
+    return false if move.current_piece.nil?
+
+    attackers = move.current_piece.color == 'white' ? board.black_pieces : board.white_pieces
+
+    defending_king = move.current_piece.color == 'white' ? board.white_pieces[0] : board.black_pieces[0]
+
+    # Temporarily save original position
+    original_position = move.current_piece.position
+    move.current_piece.position = end_coordinates
+
+    in_check = attackers.any? do |attacker|
+      attacker.valid_move?(board, attacker.position, defending_king.position)
+    end
+
+    move.current_piece.position = original_position
+
+    in_check
+  end
+
   # useful for queens and castles
   def horizontal_move?(start_coordinates, end_coordinates)
     start_row, = start_coordinates

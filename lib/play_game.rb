@@ -29,9 +29,8 @@ class PlayGame
     @chess_board.display_board
     loop do
       @win.check?          # <- always update check state
-      break if @win.checkmate?
+      break if @win.checkmate? || @win.stalemate?(@current_player)
 
-      turn_message
       move_piece
       @win.check?          # <- re-evaluate after move
       check_message
@@ -61,27 +60,26 @@ class PlayGame
     end
   end
 
-  private
-
   def self.load
-    if File.exist?('saved_game.marshal')
-      File.open('saved_game.marshal', 'rb') do |file|
-        Marshal.load(file)
-      end
-    else
-      nil
+    return unless File.exist?('saved_game.marshal')
+
+    File.open('saved_game.marshal', 'rb') do |file|
+      Marshal.load(file)
     end
   end
 
+  private
+
   def end_game
     checkmate_message if @win.checkmate?
+    stalemate_message if @win.stalemate?(@current_player)
     score_message
   end
 
   def move_piece
     @move.start_coordinate = request_and_process_start_coordinate(@current_player, @chess_board, @move)
     @move.set_current_piece
-    @move.end_coordinate = request_and_process_end_coordinate(@current_player, @chess_board, @move)
+    @move.end_coordinate = request_and_process_end_coordinate(@current_player, @chess_board, @move, @chess_board)
 
     was_capture = @chess_board.captured_piece_at(@move.end_coordinate)
     if was_capture

@@ -29,7 +29,7 @@ module PlayerInput
     end
   end
 
-  def request_and_process_end_coordinate(current_player, chess_board, move)
+  def request_and_process_end_coordinate(current_player, chess_board, move, board)
     loop do
       puts "#{current_player.name}, please enter the coordinates to move your #{move.current_piece.name} (e.g. e4):"
       input = gets.chomp.downcase
@@ -48,7 +48,8 @@ module PlayerInput
 
       # Validate the move
       if move.current_piece.valid_move?(chess_board, move.start_coordinate, coordinate) &&
-         current_player.player_piece_match?(move.current_piece)
+         current_player.player_piece_match?(move.current_piece) &&
+         !move.current_piece.put_king_into_check?(coordinate, board, move)
         return coordinate
       else
         puts 'Not a valid move!'
